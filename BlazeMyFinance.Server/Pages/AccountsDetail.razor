@@ -1,0 +1,106 @@
+﻿@page "/accountinfo/{AccountNumber}/{CustomerName}"
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@using Microsoft.AspNetCore.Components
+
+<PageTitle>Account Detail</PageTitle>
+
+<style>
+    tbody, td, tfoot, th, thead, tr {
+        border: 1pt solid !important;
+        padding: 0.25rem !important;
+    }
+</style>
+
+<h1><u>Account Detail</u></h1>
+<hr />
+
+@if (customerInfo == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <p>Customer Name: @CustomerName</p>
+    <p>Account Number: @customerInfo.AccountInfo?.AccountNumber.ToString().PadLeft(8, '0')</p>
+    <p>Account Balance: @customerInfo.AccountInfo?.RemainingBalance?.ToString("C")</p>
+
+    <h4>Recent Transactions</h4>
+    <hr />
+    @if (customerInfo.Transactions == null)
+    {
+        <h4>There are no transactions available</h4>
+    }
+    else
+    {
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        Transaction Date & Time
+                    </th>
+                    <th>
+                        Transaction Amount
+                    </th>
+                    <th>
+                        Account Balance
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (var transInfo in customerInfo.Transactions)
+                    {
+                        <tr>
+                            <td>@transInfo.TransactionDateTime</td>
+                            <td>@transInfo.Amount?.ToString("C")</td>
+                            <td> @transInfo.RemainingBalance?.ToString("C")</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    private CustomerInfo? customerInfo;
+
+    [Parameter]
+    public string AccountNumber { get; set; } = string.Empty;
+
+    [Parameter]
+    public string CustomerName { get; set; } = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (!string.IsNullOrWhiteSpace(CustomerName))
+        {
+            CustomerName = Uri.UnescapeDataString(CustomerName);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(AccountNumber))
+            {
+                var uri = NavManager.BaseUri + $"api/dashboard/getaccountinfo/{AccountNumber}";
+                var apiResult = await Http.GetFromJsonAsync<CustomerInfo>(uri);
+                if (apiResult != null)
+                {
+                    customerInfo = apiResult;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid input format");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}

@@ -47,6 +47,7 @@ namespace BlazeMyFinance.API.Controllers
                     var transactionsList = Enumerable.Range(1, 10)
                     .Select(id => new TransactionInfo
                     {
+                        TransactionDateTime = DateTime.Now.AddDays(-random.Next(1, 200)),
                         AccountId = accountId,
                         Amount = random.Next(1, 9999),
                         RemainingBalance = random.Next(1, 99999)

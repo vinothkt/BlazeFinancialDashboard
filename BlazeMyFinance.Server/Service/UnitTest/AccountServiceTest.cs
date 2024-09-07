@@ -30,12 +30,12 @@ namespace BlazeMyFinance.Server.Service.UnitTest
         }
 
         [Fact]
-        public async Task GetAllAccountsTest()
+        public async Task GetAllCustomersTest()
         {
             //Arrange
 
             //Act
-            var result = await _service.GetAllAccountsAsync();
+            var result = await _service.GetAllCustomersAsync();
 
             //Assert
             Assert.Equal(true, result != null);
@@ -59,7 +59,7 @@ namespace BlazeMyFinance.Server.Service.UnitTest
             //Arrange
 
             //Act
-            var result = await _service.UpdateAccountInfoAsync(new AccountInfo() { AccountId = 2, IsActive = false });
+            var result = await _service.UpdateAccountInfoAsync(new AccountInfo() { AccountNumber = 2, IsActive = false });
 
             //Assert
             Assert.Equal(true, result != null);

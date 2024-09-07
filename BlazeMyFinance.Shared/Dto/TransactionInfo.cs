@@ -31,11 +31,6 @@
         public decimal? RemainingBalance { get; set; }
 
         /// <summary>
-        /// gets/sets notes
-        /// </summary>
-        public string? Notes { get; set; }
-
-        /// <summary>
         /// constructor
         /// </summary>
         public TransactionInfo()

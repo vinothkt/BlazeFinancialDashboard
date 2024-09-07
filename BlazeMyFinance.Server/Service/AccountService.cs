@@ -9,7 +9,7 @@ namespace BlazeMyFinance.Server.Service
 
     public interface IAccountService
     {
-        Task<ApiResult<List<AccountInfo>>> GetAllAccountsAsync();
+        Task<ApiResult<List<CustomerInfo>>> GetAllCustomersAsync();
         Task<ApiResult<AccountInfo>> GetBalanceAsync(long accountId);
         Task<ApiResult<AccountInfo>> UpdateAccountInfoAsync(AccountInfo accountInfo);
     }
@@ -26,16 +26,16 @@ namespace BlazeMyFinance.Server.Service
         }
 
         /// <summary>
-        /// GetAllAccountsAsync
+        /// GetAllCustomersAsync
         /// </summary>
         /// <returns></returns>
-        public async Task<ApiResult<List<AccountInfo>>> GetAllAccountsAsync()
+        public async Task<ApiResult<List<CustomerInfo>>> GetAllCustomersAsync()
         {
-            ApiResult<List<AccountInfo>> apiResult = new();
+            ApiResult<List<CustomerInfo>> apiResult = new();
             try
             {
-                var uri = _endPoints.Value.GetAllAccounts;
-                var response = await _httpFactory.GetApiCall<ApiResult<List<AccountInfo>>>(uri);
+                var uri = _endPoints.Value.GetAllCustomers;
+                var response = await _httpFactory.GetApiCall<ApiResult<List<CustomerInfo>>>(uri);
                 if(response != null)
                 {
                     apiResult = response;

@@ -33,7 +33,15 @@ namespace BlazeMyFinance.Server.Service
             try
             {
                 var uri =  string.Format(_endPoints.Value.GetTransactions, accountId);
-                apiResult = await _httpFactory.GetApiCall<ApiResult<List<TransactionInfo>>>(uri);
+                var response = await _httpFactory.GetApiCall<ApiResult<List<TransactionInfo>>>(uri);
+                if (response != null)
+                {
+                    apiResult = response;
+                }
+                else
+                {
+                    apiResult.Success = false;
+                }
             }
             catch (Exception ex)
             {

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BlazeMyFinance.Shared.Dto
+﻿namespace BlazeMyFinance.Shared.Dto
 {
     /// <summary>
     /// AccountInfo - object holds customer account info
@@ -13,20 +11,19 @@ namespace BlazeMyFinance.Shared.Dto
         public Guid Guid { get; set; }
 
         /// <summary>
-        /// gets/sets a unique id for every account holder
+        /// gets/sets a customer id
         /// </summary>
-        public long AccountId { get; set; }
+        public long CustomerId { get; set; }
 
         /// <summary>
-        /// gets/sets a customer full name
+        /// gets/sets a unique number for every account holder
         /// </summary>
-        [StringLength(200)]
-        public string CustomerName { get; set; }
+        public long AccountNumber { get; set; }
 
         /// <summary>
         /// gets/sets a balance amount
         /// </summary>
-        public decimal? Balance { get; set; }
+        public decimal? RemainingBalance { get; set; }
         
         /// <summary>
         /// gets/sets a status of account
@@ -41,4 +38,5 @@ namespace BlazeMyFinance.Shared.Dto
             Guid = Guid.NewGuid();
         }
     }
+
 }

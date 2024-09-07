@@ -1,9 +1,115 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Financial - Dashboard</PageTitle>
 
-<h1>Hello, world!</h1>
+@inject HttpClient Http
+@inject NavigationManager NavManager
+@using BlazeMyFinance.Shared.Dto
+@using System.Collections
+@using System.Net
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<style>
+    tbody, td, tfoot, th, thead, tr {
+        border: 1pt solid !important;
+        padding:0.25rem !important;
+    }
+</style>
+
+<h1>All Customers List</h1>
+
+@if (dashboardInfo == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    Customer Name
+                </th>
+                <th>
+                    Account Number
+                </th>
+                <th>
+                    Active
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (dashboardInfo.Customers == null)
+            {
+                <tr colspan="5">No customer info available</tr>
+            }
+            else
+            {
+                @foreach (var cust in dashboardInfo.Customers)
+                {
+                    var active = (bool)cust.AccountInfo?.IsActive == true ? true : false;
+                    var url = $"/accountinfo/{cust.AccountInfo?.AccountNumber}/{Uri.EscapeDataString(cust.CustomerName)}";
+                    <tr>
+                        <td>@cust.CustomerName</td>
+                        <td>@cust.AccountInfo?.AccountNumber.ToString().PadLeft(8, '0')</td>
+                        <td><input type="checkbox" checked="@active" onchange=@(() => ChangeStatus(cust.AccountInfo))/> </td>
+                        <td><a href="@url">View Detail</a></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public DashboardInfo dashboardInfo = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var uri = NavManager.BaseUri + "api/dashboard/getallcustomers";
+            var apiResult = await Http.GetFromJsonAsync<DashboardInfo>(uri);
+            if (apiResult != null)
+            {
+                dashboardInfo = apiResult;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public async Task ChangeStatus(AccountInfo accountInfo)
+    {
+        try
+        {
+            //Notes: All endpoints should be moved to appsettings
+            var uri = NavManager.BaseUri + "api/dashboard/updateaccountinfo";
+            var apiResult = await Http.PostAsJsonAsync<AccountInfo>(uri, accountInfo);
+            apiResult.EnsureSuccessStatusCode();
+            if (apiResult.IsSuccessStatusCode)
+            {
+                //if success, update the current list with new status and rerender UI
+                var updatedAccountInfo = await apiResult.Content.ReadFromJsonAsync<AccountInfo>();
+                if (updatedAccountInfo != null)
+                {
+                    var cutomerToUpdate = dashboardInfo.Customers.FirstOrDefault(ix => ix.CustomerId == accountInfo.CustomerId);
+                    if (cutomerToUpdate != null && cutomerToUpdate.AccountInfo != null)
+                    {
+                        cutomerToUpdate.AccountInfo.IsActive = updatedAccountInfo.IsActive;
+                    }
+                    StateHasChanged();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
